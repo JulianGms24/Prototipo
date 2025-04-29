@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Asistencia</title>
+    <link rel="stylesheet" href="Asistencia.css">
+</head>
+<body>
+
+    <h1>GESTIÓN DE ASISTENCIA</h1>
+
+    <hr>
+
+    <h2>Registrar Nueva Asistencia</h2>
+    <form id="form-registrar-asistencia">
+        Fecha: <input type="date" id="fechaRegistrar"><br>
+        Hora de Inicio: <input type="time" id="horaInicioRegistrar"><br>
+        Hora Final: <input type="time" id="horaFinalRegistrar"><br>
+        <h3>Registrar Estado Estudiantes:</h3>
+        Código Estudiante: <input type="text" id="codigoEstudianteRegistrar"><br>
+        Nombre Estudiante: <input type="text" id="nombreEstudianteRegistrar"><br>
+        Estado:
+        <select id="estadoRegistrar">
+            <option value="A Tiempo">A Tiempo</option>
+            <option value="Tarde">Tarde</option>
+            <option value="No Llegó">No Llegó</option>
+        </select><br><br>
+        <button type="button" onclick="registrarAsistencia()">Registrar</button>
+    </form>
+
+    <hr>
+
+    <h2>Modificar Asistencia</h2>
+    <form id="form-modificar-asistencia">
+        Buscar Fecha: <input type="date" id="fechaModificar"><br>
+        Buscar Hora de Inicio: <input type="time" id="horaInicioModificar"><br><br>
+        Código Estudiante: <input type="text" id="codigoEstudianteModificar"><br>
+        Nuevo Estado:
+        <select id="nuevoEstadoModificar">
+            <option value="A Tiempo">A Tiempo</option>
+            <option value="Tarde">Tarde</option>
+            <option value="No Llegó">No Llegó</option>
+        </select><br><br>
+        <button type="button" onclick="modificarAsistencia()">Modificar</button>
+    </form>
+
+    <hr>
+
+    <h2>Buscar Asistencia</h2>
+    <form id="form-buscar-asistencia">
+        Fecha: <input type="date" id="fechaBuscar"><br>
+        Hora de Inicio: <input type="time" id="horaInicioBuscar"><br><br>
+        <button type="button" onclick="buscarAsistencia()">Buscar</button>
+    </form>
+
+    <hr>
+
+    <h2>Eliminar Asistencia</h2>
+    <form id="form-eliminar-asistencia">
+        Fecha: <input type="date" id="fechaEliminar"><br>
+        Hora de Inicio: <input type="time" id="horaInicioEliminar"><br><br>
+        Código Estudiante (si quieres eliminar uno): <input type="text" id="codigoEstudianteEliminar"><br><br>
+        <button type="button" onclick="eliminarAsistencia()">Eliminar</button>
+    </form>
+
+    <script>
+        // Aquí se guardarán las asistencias
+        let asistencias = [];
+
+        function registrarAsistencia() {
+            const fecha = document.getElementById('fechaRegistrar').value;
+            const horaInicio = document.getElementById('horaInicioRegistrar').value;
+            const horaFinal = document.getElementById('horaFinalRegistrar').value;
+            const codigo = document.getElementById('codigoEstudianteRegistrar').value;
+            const nombre = document.getElementById('nombreEstudianteRegistrar').value;
+            const estado = document.getElementById('estadoRegistrar').value;
+
+            asistencias.push({
+                fecha: fecha,
+                horaInicio: horaInicio,
+                horaFinal: horaFinal,
+                codigo: codigo,
+                nombre: nombre,
+                estado: estado
+            });
+
+            alert("Asistencia registrada correctamente.");
+        }
+
+        function buscarAsistencia() {
+            const fecha = document.getElementById('fechaBuscar').value;
+            const horaInicio = document.getElementById('horaInicioBuscar').value;
+
+            let encontrados = asistencias.filter(a => a.fecha === fecha && a.horaInicio === horaInicio);
+
+            if (encontrados.length > 0) {
+                let mensaje = "Asistencias encontradas:\n\n";
+                encontrados.forEach(a => {
+                    mensaje += `Nombre: ${a.nombre}\nCódigo: ${a.codigo}\nEstado: ${a.estado}\n\n`;
+                });
+                alert(mensaje);
+            } else {
+                alert("No se encontraron asistencias para esa fecha y hora.");
+            }
+        }
+
+        function modificarAsistencia() {
+            const fecha = document.getElementById('fechaModificar').value;
+            const horaInicio = document.getElementById('horaInicioModificar').value;
+            const codigo = document.getElementById('codigoEstudianteModificar').value;
+            const nuevoEstado = document.getElementById('nuevoEstadoModificar').value;
+
+            let encontrado = asistencias.find(a => a.fecha === fecha && a.horaInicio === horaInicio && a.codigo === codigo);
+
+            if (encontrado) {
+                encontrado.estado = nuevoEstado;
+                alert("Asistencia modificada exitosamente.");
+            } else {
+                alert("No se encontró el registro para modificar.");
+            }
+        }
+
+        function eliminarAsistencia() {
+            const fecha = document.getElementById('fechaEliminar').value;
+            const horaInicio = document.getElementById('horaInicioEliminar').value;
+            const codigo = document.getElementById('codigoEstudianteEliminar').value;
+
+            if (codigo.trim() !== "") {
+                // Eliminar asistencia específica de un estudiante
+                let index = asistencias.findIndex(a => a.fecha === fecha && a.horaInicio === horaInicio && a.codigo === codigo);
+                if (index !== -1) {
+                    const confirmar = confirm(`¿Seguro que deseas eliminar a ${asistencias[index].nombre} (${asistencias[index].codigo})?`);
+                    if (confirmar) {
+                        asistencias.splice(index, 1);
+                        alert("Asistencia eliminada correctamente.");
+                    }
+                } else {
+                    alert("No se encontró el estudiante.");
+                }
+            } else {
+                // Eliminar todas las asistencias de esa fecha y hora
+                let encontrados = asistencias.filter(a => a.fecha === fecha && a.horaInicio === horaInicio);
+                if (encontrados.length > 0) {
+                    const confirmar = confirm(`Se encontraron ${encontrados.length} registros. ¿Deseas eliminar todos?`);
+                    if (confirmar) {
+                        asistencias = asistencias.filter(a => !(a.fecha === fecha && a.horaInicio === horaInicio));
+                        alert("Todas las asistencias eliminadas.");
+                    }
+                } else {
+                    alert("No se encontraron asistencias para eliminar.");
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

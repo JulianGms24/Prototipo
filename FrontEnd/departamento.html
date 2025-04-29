@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Departamento.css">
+    <title>Gestion de departamento</title>
+   
+</head>
+<body>
+  <div class="container">
+    <h2>Departamento</h2>
+    <p><strong>Nombre actual:</strong> <span id="nombreActual">Departamento</span></p>
+
+    <button onclick="mostrarNombre()">Ver nombre actual</button>
+
+    <h3>Editar nombre del departamento</h3>
+
+    <form onsubmit="editarNombre(); return false;">
+      <label>Nuevo nombre:</label>
+      <input type="text" id="nuevoNombre" placeholder="Escribe el nuevo nombre">
+      <button type="submit">Actualizar nombre</button>
+    </form>
+
+    <p id="mensaje"></p>
+  </div>
+
+  <script>
+    // Variable inicial del nombre
+    let nombreDepartamento = "Departamento";
+
+    function mostrarNombre() {
+      alert("El nombre actual del departamento es: " + nombreDepartamento);
+    }
+
+    function editarNombre() {
+      const nuevo = document.getElementById("nuevoNombre").value.trim();
+      const mensaje = document.getElementById("mensaje");
+
+      if (nuevo === "") {
+        mensaje.textContent = "Por favor escribe el nuevo nombre.";
+        return;
+      }
+
+      nombreDepartamento = nuevo;
+      document.getElementById("nombreActual").textContent = nombreDepartamento;
+      mensaje.textContent = "Nombre actualizado correctamente.";
+      document.getElementById("nuevoNombre").value = "";
+    }
+  </script>
+</body>
+</html>

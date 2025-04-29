@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Asignaturas</title>
+  <link rel="stylesheet" href="Asignatura.css">
+
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    section { margin-bottom: 30px; border: 1px solid #ccc; padding: 10px; border-radius: 10px; }
+    h2 { margin-top: 0; }
+    input, button { margin: 5px 0; display: block; }
+    .result { margin-top: 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Gestión de Asignaturas</h1>
+
+  <!-- Consultar -->
+  <section>
+    <h2>Consultar Asignatura</h2>
+    <input type="text" id="consultarCodigo" placeholder="Código de la asignatura">
+    <button onclick="consultarAsignatura()">Consultar</button>
+    <div id="consultaResultado" class="result"></div>
+  </section>
+
+  <!-- Agregar -->
+  <section>
+    <h2>Agregar Asignatura</h2>
+    <input type="text" id="nuevoCodigo" placeholder="Código">
+    <input type="text" id="nuevoNombre" placeholder="Nombre">
+    <input type="text" id="nuevoCreditos" placeholder="Créditos">
+    <input type="text" id="nuevoSemestre" placeholder="Semestre">
+    <button onclick="agregarAsignatura()">Agregar</button>
+    <div id="agregadoResultado" class="result"></div>
+  </section>
+
+  <!-- Modificar -->
+  <section>
+    <h2>Modificar Asignatura</h2>
+    <input type="text" id="modCodigoBuscar" placeholder="Código a modificar">
+    <button onclick="cargarAsignatura()">Buscar</button>
+    <div id="modificarFormulario" style="display:none">
+      <input type="text" id="modNombre" placeholder="Nuevo Nombre">
+      <input type="text" id="modCreditos" placeholder="Nuevos Créditos">
+      <input type="text" id="modSemestre" placeholder="Nuevo Semestre">
+      <button onclick="guardarCambios()">Guardar Cambios</button>
+    </div>
+    <div id="modResultado" class="result"></div>
+  </section>
+
+  <!-- Eliminar -->
+  <section>
+    <h2>Eliminar Asignatura</h2>
+    <input type="text" id="elimCodigo" placeholder="Código de la asignatura">
+    <button onclick="buscarEliminar()">Buscar</button>
+    <div id="eliminarDatos"></div>
+  </section>
+
+<script>
+  let asignaturas = [];
+
+  function consultarAsignatura() {
+    const codigo = document.getElementById("consultarCodigo").value;
+    const asignatura = asignaturas.find(a => a.codigo === codigo);
+    document.getElementById("consultaResultado").innerText = asignatura ? 
+      `Nombre: ${asignatura.nombre}, Créditos: ${asignatura.creditos}, Semestre: ${asignatura.semestre}` :
+      "Asignatura no encontrada";
+  }
+
+  function agregarAsignatura() {
+    const nueva = {
+      codigo: document.getElementById("nuevoCodigo").value,
+      nombre: document.getElementById("nuevoNombre").value,
+      creditos: document.getElementById("nuevoCreditos").value,
+      semestre: document.getElementById("nuevoSemestre").value
+    };
+    asignaturas.push(nueva);
+    document.getElementById("agregadoResultado").innerText = "Asignatura agregada correctamente.";
+  }
+
+  function cargarAsignatura() {
+    const codigo = document.getElementById("modCodigoBuscar").value;
+    const asignatura = asignaturas.find(a => a.codigo === codigo);
+    if (asignatura) {
+      document.getElementById("modificarFormulario").style.display = "block";
+      document.getElementById("modNombre").value = asignatura.nombre;
+      document.getElementById("modCreditos").value = asignatura.creditos;
+      document.getElementById("modSemestre").value = asignatura.semestre;
+    } else {
+      document.getElementById("modResultado").innerText = "Asignatura no encontrada.";
+    }
+  }
+
+  function guardarCambios() {
+    const codigo = document.getElementById("modCodigoBuscar").value;
+    const asignatura = asignaturas.find(a => a.codigo === codigo);
+    if (asignatura) {
+      asignatura.nombre = document.getElementById("modNombre").value;
+      asignatura.creditos = document.getElementById("modCreditos").value;
+      asignatura.semestre = document.getElementById("modSemestre").value;
+      document.getElementById("modResultado").innerText = "Cambios guardados correctamente.";
+    }
+  }
+
+  function buscarEliminar() {
+    const codigo = document.getElementById("elimCodigo").value;
+    const asignatura = asignaturas.find(a => a.codigo === codigo);
+    if (asignatura) {
+      document.getElementById("eliminarDatos").innerHTML =
+        `<p>Nombre: ${asignatura.nombre}, Créditos: ${asignatura.creditos}, Semestre: ${asignatura.semestre}</p>
+         <button onclick="confirmarEliminar('${codigo}')">Sí, eliminar</button>
+         <button onclick="cancelarEliminar()">No, cancelar</button>`;
+    } else {
+      document.getElementById("eliminarDatos").innerText = "Asignatura no encontrada.";
+    }
+  }
+
+  function confirmarEliminar(codigo) {
+    asignaturas = asignaturas.filter(a => a.codigo !== codigo);
+    document.getElementById("eliminarDatos").innerText = "Asignatura eliminada exitosamente.";
+  }
+
+  function cancelarEliminar() {
+    document.getElementById("eliminarDatos").innerText = "Operación cancelada.";
+  }
+</script>
+</body>
+</html>
