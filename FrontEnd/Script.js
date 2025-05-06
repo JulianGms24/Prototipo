@@ -1,104 +1,91 @@
-let estudiantes = [];
-
-// Al cargar la página
-window.onload = function() {
-  if (localStorage.getItem('estudiantes')) {
-    estudiantes = JSON.parse(localStorage.getItem('estudiantes'));
-  }
-}
-
-function guardarEstudiantes() {
-  localStorage.setItem('estudiantes', JSON.stringify(estudiantes));
+let estudiantes = JSON.parse(localStorage.getItem("estudiantes")) || [];
+document.addEventListener('DOMContentLoaded', () => {
+  guardarEnLocalStorage();
+});
+function guardarEnLocalStorage() {
+  localStorage.setItem("estudiantes", JSON.stringify(estudiantes));
 }
 
 function agregarEstudiante() {
-  let nombre = document.getElementById("nuevoNombre").value.trim();
-  let tipoID = document.getElementById("nuevoTipoID").value;
-  let documento = document.getElementById("nuevoDocumento").value.trim();
+  const nombre = document.getElementById("nuevoNombre").value;
+  const tipo = document.getElementById("nuevoTipoID").value;
+  const documento = document.getElementById("nuevoDocumento").value;
 
-  if (nombre === "" || documento.length < 6) {
-    document.getElementById("resultadoAgregar").innerText = "Datos inválidos.";
+  if (documento.length < 10) {
+    document.getElementById("resultadoAgregar").innerHTML = "<span class='error'>Número de documento no válido.</span>";
     return;
   }
 
-  let yaExiste = estudiantes.some(est => est.documento === documento);
-  if (yaExiste) {
-    document.getElementById("resultadoAgregar").innerText = "Estudiante ya registrado.";
+  const existente = estudiantes.find(e => e.documento === documento);
+  if (existente) {
+    document.getElementById("resultadoAgregar").innerHTML = "<span class='error'>Estudiante ya registrado.</span>";
     return;
   }
 
-  estudiantes.push({ nombre: nombre, tipo: tipoID, documento: documento });
-  guardarEstudiantes();
-
+  estudiantes.push({ nombre, tipo, documento });
+  guardarEnLocalStorage();
   document.getElementById("resultadoAgregar").innerText = "Estudiante agregado correctamente.";
-  document.getElementById("nuevoNombre").value = "";
-  document.getElementById("nuevoDocumento").value = "";
 }
 
 function buscarEstudiante() {
-  let docBuscar = document.getElementById("buscarDoc").value.trim();
-  
-  if (docBuscar === "" || docBuscar.length < 6) {
-    document.getElementById("resultadoBusqueda").innerText = "Número no válido.";
-    return;
-  }
+  const doc = document.getElementById("buscarDoc").value;
+  const encontrado = estudiantes.find(e => e.documento === doc);
 
-  let estudiante = estudiantes.find(est => est.documento === docBuscar);
-  if (estudiante) {
-    alert("Estudiante encontrado:\nNombre: " + estudiante.nombre + "\nTipo ID: " + estudiante.tipo + "\nDocumento: " + estudiante.documento);
+  if (doc.length < 10) {
+    document.getElementById("resultadoBusqueda").innerHTML = "<span class='error'>Número no válido o estudiante no encontrado.</span>";
+  } else if (encontrado) {
+    alert(`Estudiante:\nNombre: ${encontrado.nombre}\nTipo ID: ${encontrado.tipo}\nDocumento: ${encontrado.documento}`);
     document.getElementById("resultadoBusqueda").innerText = "";
   } else {
-    document.getElementById("resultadoBusqueda").innerText = "Estudiante no encontrado.";
+    document.getElementById("resultadoBusqueda").innerHTML = "<span class='error'>Estudiante no encontrado.</span>";
   }
 }
 
 function prepararModificacion() {
-  let docModificar = document.getElementById("modificarDoc").value.trim();
-  let estudiante = estudiantes.find(est => est.documento === docModificar);
+  const doc = document.getElementById("modificarDoc").value;
+  const encontrado = estudiantes.find(e => e.documento === doc);
 
-  if (estudiante) {
+  if (encontrado) {
     document.getElementById("modificacionCampos").style.display = "block";
-    document.getElementById("nuevoNombreMod").value = estudiante.nombre;
-    document.getElementById("nuevoTipoIDMod").value = estudiante.tipo;
+    document.getElementById("nuevoNombreMod").value = encontrado.nombre;
+    document.getElementById("nuevoTipoIDMod").value = encontrado.tipo;
     document.getElementById("resultadoModificacion").innerText = "";
   } else {
     document.getElementById("modificacionCampos").style.display = "none";
-    document.getElementById("resultadoModificacion").innerText = "Estudiante no encontrado.";
+    document.getElementById("resultadoModificacion").innerHTML = "<span class='error'>Estudiante no encontrado.</span>";
   }
 }
 
 function modificarEstudiante() {
-  let docModificar = document.getElementById("modificarDoc").value.trim();
-  let nuevoNombre = document.getElementById("nuevoNombreMod").value.trim();
-  let nuevoTipo = document.getElementById("nuevoTipoIDMod").value;
+  const doc = document.getElementById("modificarDoc").value;
+  const nuevoNombre = document.getElementById("nuevoNombreMod").value;
+  const nuevoTipo = document.getElementById("nuevoTipoIDMod").value;
 
-  let indice = estudiantes.findIndex(est => est.documento === docModificar);
-  if (indice >= 0) {
-    estudiantes[indice].nombre = nuevoNombre;
-    estudiantes[indice].tipo = nuevoTipo;
-    guardarEstudiantes();
-    document.getElementById("resultadoModificacion").innerText = "Datos actualizados.";
+  const index = estudiantes.findIndex(e => e.documento === doc);
+  if (index !== -1) {
+    estudiantes[index].nombre = nuevoNombre;
+    estudiantes[index].tipo = nuevoTipo;
+    guardarEnLocalStorage();
+    document.getElementById("resultadoModificacion").innerText = "Estudiante modificado correctamente.";
   }
 }
 
 function agregarADepartamento() {
-  let docDep = document.getElementById("docAgregarDep").value.trim();
-  let est = estudiantes.find(est => est.documento === docDep);
-
+  const doc = document.getElementById("docAgregarDep").value;
+  const est = estudiantes.find(e => e.documento === doc);
   if (est) {
     document.getElementById("resAgregarDep").innerText = "Estudiante agregado al departamento.";
   } else {
-    document.getElementById("resAgregarDep").innerText = "Estudiante no encontrado.";
+    document.getElementById("resAgregarDep").innerHTML = "<span class='error'>Estudiante no encontrado.</span>";
   }
 }
 
 function agregarAAsignatura() {
-  let docAsig = document.getElementById("docAgregarAsig").value.trim();
-  let est = estudiantes.find(est => est.documento === docAsig);
-
+  const doc = document.getElementById("docAgregarAsig").value;
+  const est = estudiantes.find(e => e.documento === doc);
   if (est) {
     document.getElementById("resAgregarAsig").innerText = "Estudiante agregado a la asignatura.";
   } else {
-    document.getElementById("resAgregarAsig").innerText = "Estudiante no encontrado.";
+    document.getElementById("resAgregarAsig").innerHTML = "<span class='error'>Estudiante no encontrado.</span>";
   }
 }
