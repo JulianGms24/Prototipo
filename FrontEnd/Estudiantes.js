@@ -1,4 +1,5 @@
 let estudiantes = JSON.parse(localStorage.getItem("estudiantes")) || [];
+
 document.addEventListener('DOMContentLoaded', () => {
   guardarEnLocalStorage();
 });
