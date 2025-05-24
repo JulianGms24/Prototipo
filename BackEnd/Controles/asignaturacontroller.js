@@ -1,27 +1,48 @@
-import * as router from "../routes/asignaturasRouter.js";
+let asignaturas = [];
 
-export async function agregarAsignaturaController(codigo, nombre) {
-    if (!codigo || !nombre) {
-        return { exito: false, mensaje: "Todos los campos son obligatorios." };
-    }
-
-    const asignatura = { codigo, nombre };
-    return await router.agregarAsignatura(asignatura);
+export function listarAsignaturas() {
+    return {
+        statusCode: 200,
+        body: JSON.stringify(asignaturas)
+    };
 }
 
-export async function buscarAsignaturaController(codigo) {
-    if (!codigo || codigo.length < 2) {
-        return { exito: false, mensaje: "Código no válido." };
+export function agregarAsignatura(nueva) {
+    const { codigo, nombre, creditos } = nueva;
+
+    if (!codigo || !nombre || !creditos) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ exito: false, mensaje: "Todos los campos son obligatorios." })
+        };
     }
 
-    const encontrada = await router.buscarAsignaturaPorCodigo(codigo);
-    if (encontrada) {
-        return { exito: true, datos: encontrada };
+    const existe = asignaturas.find(a => a.codigo === codigo);
+    if (existe) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ exito: false, mensaje: "La asignatura ya existe." })
+        };
+    }
+
+    asignaturas.push(nueva);
+    return {
+        statusCode: 201,
+        body: JSON.stringify({ exito: true, mensaje: "Asignatura agregada correctamente." })
+    };
+}
+
+export function buscarAsignatura(id) {
+    const asignatura = asignaturas.find(a => a.codigo === id);
+    if (asignatura) {
+        return {
+            statusCode: 200,
+            body: JSON.stringify(asignatura)
+        };
     } else {
-        return { exito: false, mensaje: "Asignatura no encontrada." };
+        return {
+            statusCode: 404,
+            body: JSON.stringify({ mensaje: "Asignatura no encontrada." })
+        };
     }
-}
-
-export async function listarAsignaturasController() {
-    return await router.listarAsignaturas();
 }

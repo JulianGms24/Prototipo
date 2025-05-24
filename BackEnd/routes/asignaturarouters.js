@@ -1,31 +1,27 @@
-export async function agregarAsignatura(asignatura) {
-    try {
-        const res = await fetch("/.netlify/functions/asignaturas", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(asignatura),
-        });
-        return await res.json();
-    } catch (error) {
-        return { exito: false, mensaje: "Error al conectar con el servidor." };
-    }
-}
+import {
+    listarAsignaturas,
+    agregarAsignatura,
+    buscarAsignatura
+} from "../controllers/asignaturaController.js";
 
-export async function buscarAsignaturaPorCodigo(codigo) {
-    try {
-        const res = await fetch(`/.netlify/functions/asignaturas/${codigo}`);
-        if (!res.ok) throw new Error();
-        return await res.json();
-    } catch {
-        return null;
-    }
-}
+export function routerAsignaturas(event) {
+    const { httpMethod, path, body } = event;
 
-export async function listarAsignaturas() {
-    try {
-        const res = await fetch("/.netlify/functions/asignaturas");
-        return await res.json();
-    } catch {
-        return [];
+    if (httpMethod === "GET" && path === "/.netlify/functions/asignatura") {
+        return listarAsignaturas();
     }
+
+    if (httpMethod === "POST" && path === "/.netlify/functions/asignatura") {
+        return agregarAsignatura(JSON.parse(body));
+    }
+
+    if (httpMethod === "GET") {
+        const id = path.split("/").pop();
+        return buscarAsignatura(id);
+    }
+
+    return {
+        statusCode: 405,
+        body: JSON.stringify({ mensaje: "Método no permitido." })
+    };
 }
