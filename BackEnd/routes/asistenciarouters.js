@@ -1,21 +1,27 @@
-export async function agregarAsistencia(asistencia) {
-    try {
-        const res = await fetch("/.netlify/functions/asistencias", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(asistencia),
-        });
-        return await res.json();
-    } catch {
-        return { exito: false, mensaje: "Error al conectar con el servidor." };
-    }
-}
+import {
+    listarAsistencias,
+    agregarAsistencia,
+    buscarAsistencia
+} from "../controllers/asistenciaController.js";
 
-export async function listarAsistencias() {
-    try {
-        const res = await fetch("/.netlify/functions/asistencias");
-        return await res.json();
-    } catch {
-        return [];
+export function routerAsistencias(event) {
+    const { httpMethod, path, body } = event;
+
+    if (httpMethod === "GET" && path === "/.netlify/functions/asistencia") {
+        return listarAsistencias();
     }
+
+    if (httpMethod === "POST" && path === "/.netlify/functions/asistencia") {
+        return agregarAsistencia(JSON.parse(body));
+    }
+
+    if (httpMethod === "GET") {
+        const id = path.split("/").pop();
+        return buscarAsistencia(id);
+    }
+
+    return {
+        statusCode: 405,
+        body: JSON.stringify({ mensaje: "Método no permitido." })
+    };
 }

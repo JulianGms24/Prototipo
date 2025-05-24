@@ -1,14 +1,40 @@
-import * as router from "../routes/asistenciasRouter.js";
+let asistencias = [];
 
-export async function agregarAsistenciaController(dni, fecha, asistencia) {
-    if (!dni || !fecha || !asistencia) {
-        return { exito: false, mensaje: "Todos los campos son obligatorios." };
-    }
-
-    const registro = { dni, fecha, asistencia };
-    return await router.agregarAsistencia(registro);
+export function listarAsistencias() {
+    return {
+        statusCode: 200,
+        body: JSON.stringify(asistencias)
+    };
 }
 
-export async function listarAsistenciasController() {
-    return await router.listarAsistencias();
+export function agregarAsistencia(nueva) {
+    const { estudiante, asignatura, fecha, estado } = nueva;
+
+    if (!estudiante || !asignatura || !fecha || !estado) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ exito: false, mensaje: "Todos los campos son obligatorios." })
+        };
+    }
+
+    asistencias.push(nueva);
+    return {
+        statusCode: 201,
+        body: JSON.stringify({ exito: true, mensaje: "Asistencia registrada correctamente." })
+    };
+}
+
+export function buscarAsistencia(idEstudiante) {
+    const resultados = asistencias.filter(a => a.estudiante === idEstudiante);
+    if (resultados.length > 0) {
+        return {
+            statusCode: 200,
+            body: JSON.stringify(resultados)
+        };
+    } else {
+        return {
+            statusCode: 404,
+            body: JSON.stringify({ mensaje: "No se encontraron asistencias para este estudiante." })
+        };
+    }
 }
