@@ -1,28 +1,48 @@
-// estudiantescontroller.js
-import * as router from "../routes/estudiantesRouter.js";
+let estudiantes = [];
 
-export async function agregarEstudianteController(dni, nombre, apellidos, email) {
-    if (!dni || !nombre || !apellidos || !email) {
-        return { exito: false, mensaje: "Todos los campos son obligatorios." };
-    }
-
-    const estudiante = { dni, nombre, apellidos, email };
-    return await router.agregarEstudiante(estudiante);
+export function listarEstudiantes() {
+    return {
+        statusCode: 200,
+        body: JSON.stringify(estudiantes)
+    };
 }
 
-export async function buscarEstudianteController(dni) {
-    if (!dni || dni.length < 2) {
-        return { exito: false, mensaje: "Documento no válido." };
+export function agregarEstudiante(nuevo) {
+    const { tipoDocumento, numeroDocumento, nombre, semestre, grupo } = nuevo;
+
+    if (!tipoDocumento || !numeroDocumento || !nombre || !semestre || !grupo) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ exito: false, mensaje: "Todos los campos son obligatorios." })
+        };
     }
 
-    const encontrado = await router.buscarEstudiantePorDocumento(dni);
-    if (encontrado) {
-        return { exito: true, datos: encontrado };
+    const existe = estudiantes.find(e => e.numeroDocumento === numeroDocumento);
+    if (existe) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ exito: false, mensaje: "Estudiante ya existe." })
+        };
+    }
+
+    estudiantes.push(nuevo);
+    return {
+        statusCode: 201,
+        body: JSON.stringify({ exito: true, mensaje: "Estudiante agregado correctamente." })
+    };
+}
+
+export function buscarEstudiante(id) {
+    const estudiante = estudiantes.find(e => e.numeroDocumento === id);
+    if (estudiante) {
+        return {
+            statusCode: 200,
+            body: JSON.stringify(estudiante)
+        };
     } else {
-        return { exito: false, mensaje: "Estudiante no encontrado." };
+        return {
+            statusCode: 404,
+            body: JSON.stringify({ mensaje: "Estudiante no encontrado." })
+        };
     }
-}
-
-export async function listarEstudiantesController() {
-    return await router.listarEstudiantes();
 }

@@ -1,31 +1,27 @@
-export async function agregarEstudiante(estudiante) {
-    try {
-        const res = await fetch("/.netlify/functions/estudiantes", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(estudiante),
-        });
-        return await res.json();
-    } catch (error) {
-        return { exito: false, mensaje: "Error al conectar con el servidor." };
-    }
-}
+import {
+    listarEstudiantes,
+    agregarEstudiante,
+    buscarEstudiante
+} from "../controllers/estudianteController.js";
 
-export async function buscarEstudiantePorDocumento(numeroDocumento) {
-    try {
-        const res = await fetch(`/.netlify/functions/estudiantes/${numeroDocumento}`);
-        if (!res.ok) throw new Error();
-        return await res.json();
-    } catch {
-        return null;
-    }
-}
+export function routerEstudiantes(event) {
+    const { httpMethod, path, body } = event;
 
-export async function listarEstudiantes() {
-    try {
-        const res = await fetch("/.netlify/functions/estudiantes");
-        return await res.json();
-    } catch {
-        return [];
+    if (httpMethod === "GET" && path === "/.netlify/functions/estudiantes") {
+        return listarEstudiantes();
     }
+
+    if (httpMethod === "POST" && path === "/.netlify/functions/estudiantes") {
+        return agregarEstudiante(JSON.parse(body));
+    }
+
+    if (httpMethod === "GET") {
+        const id = path.split("/").pop();
+        return buscarEstudiante(id);
+    }
+
+    return {
+        statusCode: 405,
+        body: JSON.stringify({ mensaje: "Método no permitido." })
+    };
 }
