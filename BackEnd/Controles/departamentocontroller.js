@@ -1,39 +1,27 @@
-// departamentoController.js
+import * as router from "../routes/departamentosRouter.js";
 
-let departamentos = JSON.parse(localStorage.getItem("departamentos")) || [];
-
-function guardarDepartamentosLS() {
-    localStorage.setItem("departamentos", JSON.stringify(departamentos));
-}
-
-export function agregarDepartamento(codigo, nombre) {
+export async function agregarDepartamentoController(codigo, nombre) {
     if (!codigo || !nombre) {
         return { exito: false, mensaje: "Todos los campos son obligatorios." };
     }
 
-    if (departamentos.find(dep => dep.codigo === codigo)) {
-        return { exito: false, mensaje: "El departamento ya está registrado." };
-    }
-
-    departamentos.push({ codigo, nombre });
-    guardarDepartamentosLS();
-
-    return { exito: true, mensaje: "Departamento agregado correctamente." };
+    const departamento = { codigo, nombre };
+    return await router.agregarDepartamento(departamento);
 }
 
-export function buscarDepartamento(codigo) {
+export async function buscarDepartamentoController(codigo) {
     if (!codigo || codigo.length < 2) {
         return { exito: false, mensaje: "Código no válido." };
     }
 
-    const departamento = departamentos.find(dep => dep.codigo === codigo);
-    if (departamento) {
-        return { exito: true, datos: departamento };
+    const encontrado = await router.buscarDepartamentoPorCodigo(codigo);
+    if (encontrado) {
+        return { exito: true, datos: encontrado };
     } else {
         return { exito: false, mensaje: "Departamento no encontrado." };
     }
 }
 
-export function listarDepartamentos() {
-    return departamentos;
+export async function listarDepartamentosController() {
+    return await router.listarDepartamentos();
 }
