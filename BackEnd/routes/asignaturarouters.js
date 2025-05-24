@@ -1,44 +1,31 @@
-// Backend/Controles/asignaturacontroller.js
-import fs from 'fs';
-const path = './data/asignaturas.json';
-
-function leerAsignaturas() {
-    if (!fs.existsSync(path)) {
-        fs.writeFileSync(path, '[]');
+export async function agregarAsignatura(asignatura) {
+    try {
+        const res = await fetch("/.netlify/functions/asignaturas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(asignatura),
+        });
+        return await res.json();
+    } catch (error) {
+        return { exito: false, mensaje: "Error al conectar con el servidor." };
     }
-    const data = fs.readFileSync(path);
-    return JSON.parse(data);
 }
 
-function guardarAsignaturas(asignaturas) {
-    fs.writeFileSync(path, JSON.stringify(asignaturas, null, 2));
-}
-
-export function agregarAsignatura(codigo, nombre) {
-    const asignaturas = leerAsignaturas();
-
-    if (!codigo || !nombre) {
-        return { exito: false, mensaje: "Todos los campos son obligatorios." };
+export async function buscarAsignaturaPorCodigo(codigo) {
+    try {
+        const res = await fetch(`/.netlify/functions/asignaturas/${codigo}`);
+        if (!res.ok) throw new Error();
+        return await res.json();
+    } catch {
+        return null;
     }
+}
 
-    if (asignaturas.find(asig => asig.codigo === codigo)) {
-        return { exito: false, mensaje: "La asignatura ya está registrada." };
+export async function listarAsignaturas() {
+    try {
+        const res = await fetch("/.netlify/functions/asignaturas");
+        return await res.json();
+    } catch {
+        return [];
     }
-
-    asignaturas.push({ codigo, nombre });
-    guardarAsignaturas(asignaturas);
-
-    return { exito: true, mensaje: "Asignatura agregada correctamente." };
-}
-
-export function buscarAsignatura(codigo) {
-    const asignaturas = leerAsignaturas();
-    const asignatura = asignaturas.find(asig => asig.codigo === codigo);
-    return asignatura
-        ? { exito: true, datos: asignatura }
-        : { exito: false, mensaje: "Asignatura no encontrada." };
-}
-
-export function listarAsignaturas() {
-    return leerAsignaturas();
 }
