@@ -1,27 +1,48 @@
-import * as router from "../routes/departamentosRouter.js";
+let departamentos = [];
 
-export async function agregarDepartamentoController(codigo, nombre) {
+export function listarDepartamentos() {
+    return {
+        statusCode: 200,
+        body: JSON.stringify(departamentos)
+    };
+}
+
+export function agregarDepartamento(nuevo) {
+    const { codigo, nombre } = nuevo;
+
     if (!codigo || !nombre) {
-        return { exito: false, mensaje: "Todos los campos son obligatorios." };
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ exito: false, mensaje: "Todos los campos son obligatorios." })
+        };
     }
 
-    const departamento = { codigo, nombre };
-    return await router.agregarDepartamento(departamento);
+    const existe = departamentos.find(dep => dep.codigo === codigo);
+    if (existe) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ exito: false, mensaje: "El departamento ya existe." })
+        };
+    }
+
+    departamentos.push(nuevo);
+    return {
+        statusCode: 201,
+        body: JSON.stringify({ exito: true, mensaje: "Departamento agregado correctamente." })
+    };
 }
 
-export async function buscarDepartamentoController(codigo) {
-    if (!codigo || codigo.length < 2) {
-        return { exito: false, mensaje: "Código no válido." };
-    }
-
-    const encontrado = await router.buscarDepartamentoPorCodigo(codigo);
-    if (encontrado) {
-        return { exito: true, datos: encontrado };
+export function buscarDepartamento(id) {
+    const departamento = departamentos.find(d => d.codigo === id);
+    if (departamento) {
+        return {
+            statusCode: 200,
+            body: JSON.stringify(departamento)
+        };
     } else {
-        return { exito: false, mensaje: "Departamento no encontrado." };
+        return {
+            statusCode: 404,
+            body: JSON.stringify({ mensaje: "Departamento no encontrado." })
+        };
     }
-}
-
-export async function listarDepartamentosController() {
-    return await router.listarDepartamentos();
 }

@@ -1,30 +1,27 @@
-export async function agregarDepartamento(departamento) {
-    try {
-        const res = await fetch("/.netlify/functions/departamentos", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(departamento),
-        });
-        return await res.json();
-    } catch {
-        return { exito: false, mensaje: "Error al conectar con el servidor." };
-    }
-}
+import {
+    listarDepartamentos,
+    agregarDepartamento,
+    buscarDepartamento
+} from "../controllers/departamentoController.js";
 
-export async function buscarDepartamentoPorCodigo(codigo) {
-    try {
-        const res = await fetch(`/.netlify/functions/departamentos/${codigo}`);
-        return res.ok ? await res.json() : null;
-    } catch {
-        return null;
-    }
-}
+export function routerDepartamentos(event) {
+    const { httpMethod, path, body } = event;
 
-export async function listarDepartamentos() {
-    try {
-        const res = await fetch("/.netlify/functions/departamentos");
-        return await res.json();
-    } catch {
-        return [];
+    if (httpMethod === "GET" && path === "/.netlify/functions/departamento") {
+        return listarDepartamentos();
     }
+
+    if (httpMethod === "POST" && path === "/.netlify/functions/departamento") {
+        return agregarDepartamento(JSON.parse(body));
+    }
+
+    if (httpMethod === "GET") {
+        const id = path.split("/").pop();
+        return buscarDepartamento(id);
+    }
+
+    return {
+        statusCode: 405,
+        body: JSON.stringify({ mensaje: "Método no permitido." })
+    };
 }
