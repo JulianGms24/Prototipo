@@ -1,35 +1,27 @@
-// asignaturacontroller.js
+import * as router from "../routes/asignaturasRouter.js";
 
-let asignaturas = JSON.parse(localStorage.getItem("asignaturas")) || [];
-
-function guardarAsignaturasLS() {
-    localStorage.setItem("asignaturas", JSON.stringify(asignaturas));
-}
-
-export function agregarAsignatura(codigo, nombre) {
+export async function agregarAsignaturaController(codigo, nombre) {
     if (!codigo || !nombre) {
         return { exito: false, mensaje: "Todos los campos son obligatorios." };
     }
 
-    if (asignaturas.find(asig => asig.codigo === codigo)) {
-        return { exito: false, mensaje: "La asignatura ya está registrada." };
-    }
-
-    asignaturas.push({ codigo, nombre });
-    guardarAsignaturasLS();
-
-    return { exito: true, mensaje: "Asignatura agregada correctamente." };
+    const asignatura = { codigo, nombre };
+    return await router.agregarAsignatura(asignatura);
 }
 
-export function buscarAsignatura(codigo) {
-    const asignatura = asignaturas.find(asig => asig.codigo === codigo);
-    if (asignatura) {
-        return { exito: true, datos: asignatura };
+export async function buscarAsignaturaController(codigo) {
+    if (!codigo || codigo.length < 2) {
+        return { exito: false, mensaje: "Código no válido." };
+    }
+
+    const encontrada = await router.buscarAsignaturaPorCodigo(codigo);
+    if (encontrada) {
+        return { exito: true, datos: encontrada };
     } else {
         return { exito: false, mensaje: "Asignatura no encontrada." };
     }
 }
 
-export function listarAsignaturas() {
-    return asignaturas;
+export async function listarAsignaturasController() {
+    return await router.listarAsignaturas();
 }
