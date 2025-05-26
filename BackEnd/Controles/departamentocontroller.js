@@ -1,48 +1,50 @@
-let departamentos = [];
-
-export function listarDepartamentos() {
-    return {
-        statusCode: 200,
-        body: JSON.stringify(departamentos)
-    };
-}
-
-export function agregarDepartamento(nuevo) {
-    const { codigo, nombre } = nuevo;
-
-    if (!codigo || !nombre) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ exito: false, mensaje: "Todos los campos son obligatorios." })
-        };
+const departamentoController = {
+  async registrar(departamento) {
+    try {
+      const respuesta = await fetch("/.netlify/functions/departamentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(departamento)
+      });
+      return await respuesta.json();
+    } catch (error) {
+      return { exito: false, mensaje: "Error al registrar departamento." };
     }
+  },
 
-    const existe = departamentos.find(dep => dep.codigo === codigo);
-    if (existe) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ exito: false, mensaje: "El departamento ya existe." })
-        };
+  async consultar(nombre) {
+    try {
+      const respuesta = await fetch(`/.netlify/functions/departamentos/${nombre}`);
+      if (!respuesta.ok) return null;
+      return await respuesta.json();
+    } catch (error) {
+      return null;
     }
+  },
 
-    departamentos.push(nuevo);
-    return {
-        statusCode: 201,
-        body: JSON.stringify({ exito: true, mensaje: "Departamento agregado correctamente." })
-    };
-}
-
-export function buscarDepartamento(id) {
-    const departamento = departamentos.find(d => d.codigo === id);
-    if (departamento) {
-        return {
-            statusCode: 200,
-            body: JSON.stringify(departamento)
-        };
-    } else {
-        return {
-            statusCode: 404,
-            body: JSON.stringify({ mensaje: "Departamento no encontrado." })
-        };
+  async modificar(nombre, nuevoNombre) {
+    try {
+      const respuesta = await fetch(`/.netlify/functions/departamentos/${nombre}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nuevoNombre })
+      });
+      return await respuesta.json();
+    } catch (error) {
+      return { exito: false, mensaje: "Error al modificar departamento." };
     }
-}
+  },
+
+  async eliminar(nombre) {
+    try {
+      const respuesta = await fetch(`/.netlify/functions/departamentos/${nombre}`, {
+        method: "DELETE"
+      });
+      return await respuesta.json();
+    } catch (error) {
+      return { exito: false, mensaje: "Error al eliminar departamento." };
+    }
+  }
+};
+
+export default departamentoController;
