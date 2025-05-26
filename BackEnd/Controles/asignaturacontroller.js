@@ -1,48 +1,48 @@
-let asignaturas = [];
-
-export function listarAsignaturas() {
-    return {
-        statusCode: 200,
-        body: JSON.stringify(asignaturas)
-    };
-}
-
-export function agregarAsignatura(nueva) {
-    const { codigo, nombre, creditos } = nueva;
-
-    if (!codigo || !nombre || !creditos) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ exito: false, mensaje: "Todos los campos son obligatorios." })
-        };
+const asignaturaController = {
+  async agregar(codigo, nombre, creditos, semestre) {
+    try {
+      const respuesta = await fetch("/.netlify/functions/asignaturas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codigo, nombre, creditos, semestre })
+      });
+      return await respuesta.json();
+    } catch (error) {
+      return { exito: false, mensaje: "Error de red o servidor." };
     }
+  },
 
-    const existe = asignaturas.find(a => a.codigo === codigo);
-    if (existe) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ exito: false, mensaje: "La asignatura ya existe." })
-        };
+  async consultar(codigo) {
+    try {
+      const respuesta = await fetch(`/.netlify/functions/asignaturas/${codigo}`);
+      if (!respuesta.ok) return null;
+      return await respuesta.json();
+    } catch (error) {
+      return null;
     }
+  },
 
-    asignaturas.push(nueva);
-    return {
-        statusCode: 201,
-        body: JSON.stringify({ exito: true, mensaje: "Asignatura agregada correctamente." })
-    };
-}
-
-export function buscarAsignatura(id) {
-    const asignatura = asignaturas.find(a => a.codigo === id);
-    if (asignatura) {
-        return {
-            statusCode: 200,
-            body: JSON.stringify(asignatura)
-        };
-    } else {
-        return {
-            statusCode: 404,
-            body: JSON.stringify({ mensaje: "Asignatura no encontrada." })
-        };
+  async modificar(codigo, nombre, creditos, semestre) {
+    try {
+      const respuesta = await fetch(`/.netlify/functions/asignaturas/${codigo}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, creditos, semestre })
+      });
+      return await respuesta.json();
+    } catch (error) {
+      return { exito: false, mensaje: "Error al modificar." };
     }
-}
+  },
+
+  async eliminar(codigo) {
+    try {
+      const respuesta = await fetch(`/.netlify/functions/asignaturas/${codigo}`, {
+        method: "DELETE"
+      });
+      return await respuesta.json();
+    } catch (error) {
+      return { exito: false, mensaje: "Error al eliminar." };
+    }
+  }
+};
