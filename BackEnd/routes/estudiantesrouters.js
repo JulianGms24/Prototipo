@@ -1,27 +1,36 @@
+// routers/estudianteRouter.js
 import {
-    listarEstudiantes,
-    agregarEstudiante,
-    buscarEstudiante
-} from "../controllers/estudianteController.js";
+  agregarEstudiante,
+  consultarEstudiante,
+  modificarEstudiante,
+  eliminarEstudiante
+} from '../controllers/estudianteController.js';
 
-export function routerEstudiantes(event) {
-    const { httpMethod, path, body } = event;
+document.getElementById("btnAgregarEstudiante").addEventListener("click", async () => {
+  const estudiante = {
+    codigo: document.getElementById("codigoEst").value,
+    nombre: document.getElementById("nombreEst").value,
+    programa: document.getElementById("programaEst").value
+  };
+  await agregarEstudiante(estudiante);
+});
 
-    if (httpMethod === "GET" && path === "/.netlify/functions/estudiantes") {
-        return listarEstudiantes();
-    }
+document.getElementById("btnConsultarEstudiante").addEventListener("click", async () => {
+  const codigo = document.getElementById("codigoConsultaEst").value;
+  const est = await consultarEstudiante(codigo);
+  document.getElementById("resultadoEstudiante").innerText = `Nombre: ${est.nombre}, Programa: ${est.programa}`;
+});
 
-    if (httpMethod === "POST" && path === "/.netlify/functions/estudiantes") {
-        return agregarEstudiante(JSON.parse(body));
-    }
+document.getElementById("btnModificarEstudiante").addEventListener("click", async () => {
+  const codigo = document.getElementById("codigoModEst").value;
+  const nuevosDatos = {
+    nombre: document.getElementById("nuevoNombreEst").value,
+    programa: document.getElementById("nuevoProgramaEst").value
+  };
+  await modificarEstudiante(codigo, nuevosDatos);
+});
 
-    if (httpMethod === "GET") {
-        const id = path.split("/").pop();
-        return buscarEstudiante(id);
-    }
-
-    return {
-        statusCode: 405,
-        body: JSON.stringify({ mensaje: "Método no permitido." })
-    };
-}
+document.getElementById("btnEliminarEstudiante").addEventListener("click", async () => {
+  const codigo = document.getElementById("codigoElimEst").value;
+  await eliminarEstudiante(codigo);
+});
