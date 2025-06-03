@@ -1,12 +1,16 @@
-const serverless = require("serverless-http");
-const express = require("express");
-const cors = require("cors");
+var express = require('express');
+var cors = require("cors");
+var serverless = require('serverless-http');
+var app = express();
 
-const app = express();
-app.use(cors());
+var asignaturasRoutes = require("../../backend/routes/asignaturasroutes.js");
+
 app.use(express.json());
+app.use(cors());
 
-const rutasAsignaturas = require("../../backend/routes/asignaturas");
-app.use("/.netlify/functions/asignaturas", rutasAsignaturas);
+var router = express.Router();
+router.use("/asignaturas", asignaturasRoutes);
 
-module.exports.handler = serverless(app);
+app.use('/.netlify/functions', router);
+
+exports.handler = serverless(app);
