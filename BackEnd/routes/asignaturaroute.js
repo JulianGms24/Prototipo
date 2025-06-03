@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const asignaturaController = require('../Controles/asignaturacontroller');
+const asignaturaController = require('../Controles/asignaturacontroller.js');
 
 // POST /.netlify/functions/asignaturas
 router.post('/', async (req, res) => {
