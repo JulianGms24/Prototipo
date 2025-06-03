@@ -4,7 +4,7 @@ import {
   consultarEstudiante,
   modificarEstudiante,
   eliminarEstudiante
-} from '../controllers/estudianteController.js';
+} from '../Controles/estudiantescontroller.js';
 
 document.getElementById("btnAgregarEstudiante").addEventListener("click", async () => {
   const estudiante = {
