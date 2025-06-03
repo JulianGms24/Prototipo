@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const asistenciaController = require("../Controles/asistenciacontroller.js");
+const asistenciaController = require("../Controles/asistenciacontroller");
 
 // Registrar asistencia
 router.post("/", async (req, res) => {
