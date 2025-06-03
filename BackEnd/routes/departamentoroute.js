@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const departamentoController = require('../controllers/departamentocontroller');
+const departamentoController = require('../Controles/departamentocontroller');
 
 // POST /.netlify/functions/departamentos
 router.post('/', async (req, res) => {
