@@ -3,13 +3,13 @@ var cors = require("cors");
 var serverless = require('serverless-http');
 var app = express();
 
-var asistenciasRoutes = require("../../Backend/routes/asistenciasroute.js");
+var asistenciasroutes = require("../../BackEnd/routes/asistenciasroute.js");
 
 app.use(express.json());
 app.use(cors());
 
 var router = express.Router();
-router.use("/asistencias", asistenciasRoutes);
+router.use("/asistencias", asistenciasroutes);
 
 app.use('/.netlify/functions', router);
 
